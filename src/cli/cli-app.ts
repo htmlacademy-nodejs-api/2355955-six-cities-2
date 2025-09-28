@@ -11,8 +11,8 @@ export class CLIApp {
   ) {
   }
 
-  public registerCommands(commandList: Command[]) {
-    commandList.forEach((command: Command) => {
+  public registerCommands(commands: Command[]) {
+    commands.forEach((command: Command) => {
       if (Object.hasOwn(this.commands, command.getName())) {
         throw new Error(`Command ${command.getName()} is already registered`);
       }

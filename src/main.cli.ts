@@ -10,6 +10,7 @@ function bootstrap() {
     new ImportCommand(),
   ]);
 
+
   cliApp.processCommand(process.argv);
 }
 

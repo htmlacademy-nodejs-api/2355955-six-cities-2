@@ -1,9 +1,11 @@
+type UserType = 'default' | 'pro';
+
 export type User = {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  userType: 'default' | 'pro';
+  userType: UserType;
   avatarPath: string;
 }
 

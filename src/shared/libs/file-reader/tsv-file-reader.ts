@@ -16,7 +16,7 @@ export class TsvFileReader {
 
   public toArray(): Offer[] {
     if (!this.rowData) {
-      throw new Error('file wa not read');
+      throw new Error('file was not read');
     }
 
     return this.rowData
