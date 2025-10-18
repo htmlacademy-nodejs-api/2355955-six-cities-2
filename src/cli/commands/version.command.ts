@@ -1,6 +1,7 @@
-import {readFileSync} from 'node:fs';
-import {resolve} from 'node:path';
-import {Command} from './command.interface.js';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { Command } from './command.interface.js';
+import { Logger } from '../../shared/helpers/index.js';
 
 type PackageJSONConfig = {
   version: string;
@@ -13,6 +14,7 @@ function isPackageJSONConfig(value: unknown): value is PackageJSONConfig {
     !Array.isArray(value) &&
     Object.hasOwn(value, 'version')
   );
+
 }
 
 export class VersionCommand implements Command {
@@ -38,13 +40,15 @@ export class VersionCommand implements Command {
 
   public async execute(..._parameters: string[]): Promise<void> {
     try {
+      Logger.section('ИНФОРМАЦИЯ О ВЕРСИИ');
       const version = this.readVersion();
-      console.info(version);
+      Logger.success(`Текущая версия приложения: ${Logger.highlightNumber(version)}`);
+      Logger.info(`Файл конфигурации: ${Logger.highlightFile(this.filePath)}`);
     } catch (error: unknown) {
-      console.error(`Failed to read version from ${this.filePath}`);
+      Logger.error(`Не удалось прочитать версию из файла ${Logger.highlightFile(this.filePath)}`);
 
       if (error instanceof Error) {
-        console.error(error.message);
+        Logger.error(error.message);
       }
     }
   }

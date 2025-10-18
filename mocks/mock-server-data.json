@@ -1,0 +1,133 @@
+{
+  "api": {
+    "categories": [
+      "Квартира",
+      "Дом",
+      "Отель",
+      "Комната",
+      "Лофт",
+      "Коттедж",
+      "Апартаменты"
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "titles": [
+      "Уютная квартира в центре города",
+      "Стильный дом у побережья",
+      "Современный номер в отеле",
+      "Минималистичный лофт с видом на реку",
+      "Коттедж в горах с камином",
+      "Апартаменты с террасой и видом на порт",
+      "Комфортабельная студия у набережной",
+      "Роскошные апартаменты в старом городе"
+    ],
+    "descriptions": [
+      "Просторная современная квартира с новым ремонтом, рядом с достопримечательностями и кафе.",
+      "Прекрасный дом с видом на море, идеален для семейного отдыха. Просторные комнаты и большой двор с садом.",
+      "Номер люкс с панорамным видом на город. Отличный выбор для деловых поездок и туристов, ценящих комфорт.",
+      "Современный лофт с панорамными окнами и уютной атмосферой. Идеален для пар и фрилансеров.",
+      "Уютный домик с панорамным видом на горы. Большая гостиная, камин и сауна в наличии.",
+      "Элегантные апартаменты в морском стиле. Терраса, кухня, кондиционер и быстрый Wi-Fi.",
+      "Небольшая, но уютная студия в шаговой доступности от центра города и реки.",
+      "Роскошные апартаменты с дизайнерским ремонтом и видом на старинные улицы города."
+    ],
+    "previewImages": [
+      "https://example.com/preview1.jpg",
+      "https://example.com/preview2.jpg",
+      "https://example.com/preview3.jpg",
+      "https://example.com/preview4.jpg",
+      "https://example.com/preview5.jpg",
+      "https://example.com/preview6.jpg",
+      "https://example.com/preview7.jpg",
+      "https://example.com/preview8.jpg"
+    ],
+    "images": [
+      "https://example.com/photo1.jpg",
+      "https://example.com/photo2.jpg",
+      "https://example.com/photo3.jpg",
+      "https://example.com/photo4.jpg",
+      "https://example.com/photo5.jpg",
+      "https://example.com/photo6.jpg",
+      "https://example.com/photo7.jpg",
+      "https://example.com/photo8.jpg",
+      "https://example.com/photo9.jpg",
+      "https://example.com/photo10.jpg",
+      "https://example.com/photo11.jpg",
+      "https://example.com/photo12.jpg"
+    ],
+    "types": [
+      "apartment",
+      "house",
+      "hotel",
+      "room"
+    ],
+    "goods": [
+      "Wi-Fi",
+      "Air conditioning",
+      "Breakfast",
+      "Fridge",
+      "Towels",
+      "Washer",
+      "Coffee machine",
+      "Laptop friendly workspace",
+      "Sauna",
+      "Baby seat",
+      "Kitchen",
+      "Parking"
+    ],
+    "users": [
+      "John Doe",
+      "Jane Smith",
+      "Mike Jordan",
+      "Alice Brown",
+      "Robert Miles",
+      "Emily Stone",
+      "Oliver White",
+      "Sophie Black"
+    ],
+    "emails": [
+      "john.doe@example.com",
+      "jane.smith@example.com",
+      "mike.jordan@example.com",
+      "alice.brown@example.com",
+      "robert.miles@example.com",
+      "emily.stone@example.com",
+      "oliver.white@example.com",
+      "sophie.black@example.com"
+    ],
+    "avatars": [
+      "https://example.com/avatars/john.jpg",
+      "https://example.com/avatars/jane.jpg",
+      "https://example.com/avatars/mike.jpg",
+      "https://example.com/avatars/alice.jpg",
+      "https://example.com/avatars/robert.jpg",
+      "https://example.com/avatars/emily.jpg",
+      "https://example.com/avatars/oliver.jpg",
+      "https://example.com/avatars/sophie.jpg"
+    ],
+    "prices": [120, 180, 250, 310, 420, 550, 620, 750],
+    "ratings": [3.5, 4.0, 4.2, 4.5, 4.6, 4.8, 5.0],
+    "dates": [
+      "2025-09-03",
+      "2025-09-05",
+      "2025-09-10",
+      "2025-09-15",
+      "2025-09-18",
+      "2025-09-20"
+    ],
+     "isPremium": [true, false],
+     "isFavorite": [true, false],
+     "isPro": [true, false],
+
+    "capacity": {
+      "bedrooms": [1, 2, 3, 4, 5],
+      "maxAdults": [2, 3, 4, 6, 8]
+    }
+  }
+}

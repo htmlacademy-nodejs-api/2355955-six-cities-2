@@ -8,6 +8,10 @@ parserOptions:
   sourceType: module
 plugins:
   - "@typescript-eslint"
+  - "@stylistic"
 extends:
   - "plugin:@typescript-eslint/recommended"
   - "htmlacademy/node"
+
+rules:
+ "@stylistic/object-curly-spacing": ["error", "always"]
