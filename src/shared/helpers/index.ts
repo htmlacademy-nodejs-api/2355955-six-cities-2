@@ -1,2 +1,4 @@
 export * from './common.js';
-export { Logger } from './logger.js';
+export { ConsoleOutput } from './console-output.js';
+export { getCurrentModuleDirectoryPath } from './get-curent-module-directory-path.js';
+

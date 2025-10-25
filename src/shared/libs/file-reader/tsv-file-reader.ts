@@ -1,6 +1,6 @@
 import EventEmitter from 'node:events';
 import { createReadStream } from 'node:fs';
-import { Logger } from '../../helpers/index.js';
+import { ConsoleOutput } from '../../helpers/index.js';
 import { FileReader } from './file-reader.interface.js';
 
 const CHUNK_SIZE = 16384; // 16KB
@@ -25,8 +25,8 @@ export class TSVFileReader extends EventEmitter implements FileReader {
 
       // Отладочная информация только при наличии переменной окружения DEBUG
       if (process.env.DEBUG) {
-        Logger.log(`Получен фрагмент данных: ${Logger.highlightNumber(chunk.length)} символов`);
-        Logger.data('Содержимое буфера', remainingData.substring(0, 100) + (remainingData.length > 100 ? '...' : ''));
+        ConsoleOutput.log(`Получен фрагмент данных: ${ConsoleOutput.highlightNumber(chunk.length)} символов`);
+        ConsoleOutput.data('Содержимое буфера', remainingData.substring(0, 100) + (remainingData.length > 100 ? '...' : ''));
       }
 
       while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {

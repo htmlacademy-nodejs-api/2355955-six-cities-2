@@ -3,7 +3,7 @@ import chalk from 'chalk';
 /**
  * Утилиты для красивого вывода в консоль с использованием chalk
  */
-export class Logger {
+export class ConsoleOutput {
   /**
    * Выводит сообщение об успешном выполнении операции
    */
