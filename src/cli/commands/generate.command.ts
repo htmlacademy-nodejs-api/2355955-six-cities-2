@@ -56,6 +56,8 @@ export class GenerateCommand implements Command {
 
       if (error instanceof Error) {
         Logger.error(error.message);
+      } else {
+        Logger.error(String(error));
       }
     }
   }
