@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "node16",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -20,11 +20,13 @@
     "sourceMap": true,
     "outDir": "./dist",
     "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
     "types": [
       "node"
     ],
     "lib": [
-      "ESNext"
+      "ESNext",
+      "DOM"
     ]
   },
   "include": [

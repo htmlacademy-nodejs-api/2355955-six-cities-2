@@ -1,5 +1,7 @@
-import {Command} from './command.interface.js';
-import {TsvFileReader} from '../../shared/libs/file-reader/index.js';
+import { Logger } from '../../shared/helpers/index.js';
+import { createOffer } from '../../shared/helpers/offer.js';
+import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
+import { Command } from './command.interface.js';
 
 
 export class ImportCommand implements Command {
@@ -7,23 +9,32 @@ export class ImportCommand implements Command {
     return '--import';
   }
 
+  private onImportedLine(line: string) {
+    const offer = createOffer(line);
+    Logger.data('Импортированное предложение', offer);
+  }
 
-  execute(...parameters: string[]) {
+  private onCompleteImport(count: number) {
+    Logger.success(`Импортировано ${Logger.highlightNumber(count)} строк данных`);
+  }
+
+  async execute(...parameters: string[]) {
     const [fileName] = parameters;
-    const fileReader = new TsvFileReader(fileName.trim());
+    const fileReader = new TSVFileReader(fileName.trim());
+
+    Logger.section('ИМПОРТ ДАННЫХ');
+    Logger.info(`Начинаю импорт данных из файла ${Logger.highlightFile(fileName.trim())}`);
+
+    fileReader.on('line', this.onImportedLine);
+    fileReader.on('end', this.onCompleteImport);
 
     try {
-
-      fileReader.read();
-      console.log('fileReader.toArray()', fileReader.toArray());
-
+      Logger.progress('Читаю файл...');
+      await fileReader.read();
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-
-
-      console.error(`Could not read file: ${fileName}`);
+      Logger.error(error instanceof Error ? error.message : String(error));
+      Logger.error(`Не удалось прочитать файл: ${Logger.highlightFile(fileName)}`);
     }
   }
+
 }

@@ -1,19 +1,14 @@
-import {User} from './user.type.js';
+import { User } from './user.type.js';
 
 export type Offer = {
-  name: string;
+  title: string;
   description: string;
-  publishDate: string;
-  city: string;
-  previewImg: string;
-  apartmentImg: string;
-  isPremium: boolean;
-  isFavourite: boolean;
-  rating: string;
+  createdDate: Date;
+  image: string;
   type: string;
-  roomsCount: string;
-  visitorsCount: string;
-  rentalCost: string;
-  facilities: string[];
+  price: number;
+  categories: string[];
   user: User;
 }
+
+

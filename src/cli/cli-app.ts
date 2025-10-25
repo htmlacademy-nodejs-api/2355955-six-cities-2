@@ -1,5 +1,5 @@
-import {Command} from './commands/command.interface.js';
-import {CommandParser} from './commands/index.js';
+import { Command } from './commands/command.interface.js';
+import { CommandParser } from './commands/index.js';
 
 type CommandCollection = Record<string, Command>;
 
@@ -10,6 +10,7 @@ export class CLIApp {
     private readonly defaultCommand: string = '--help'
   ) {
   }
+
 
   public registerCommands(commands: Command[]) {
     commands.forEach((command: Command) => {
