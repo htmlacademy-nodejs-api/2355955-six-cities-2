@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { ConsoleOutput } from '../../shared/helpers/index.js';
 import { Command } from './command.interface.js';
-import { Logger } from '../../shared/helpers/index.js';
 
 type PackageJSONConfig = {
   version: string;
@@ -40,15 +40,15 @@ export class VersionCommand implements Command {
 
   public async execute(..._parameters: string[]): Promise<void> {
     try {
-      Logger.section('ИНФОРМАЦИЯ О ВЕРСИИ');
+      ConsoleOutput.section('ИНФОРМАЦИЯ О ВЕРСИИ');
       const version = this.readVersion();
-      Logger.success(`Текущая версия приложения: ${Logger.highlightNumber(version)}`);
-      Logger.info(`Файл конфигурации: ${Logger.highlightFile(this.filePath)}`);
+      ConsoleOutput.success(`Текущая версия приложения: ${ConsoleOutput.highlightNumber(version)}`);
+      ConsoleOutput.info(`Файл конфигурации: ${ConsoleOutput.highlightFile(this.filePath)}`);
     } catch (error: unknown) {
-      Logger.error(`Не удалось прочитать версию из файла ${Logger.highlightFile(this.filePath)}`);
+      ConsoleOutput.error(`Не удалось прочитать версию из файла ${ConsoleOutput.highlightFile(this.filePath)}`);
 
       if (error instanceof Error) {
-        Logger.error(error.message);
+        ConsoleOutput.error(error.message);
       }
     }
   }
