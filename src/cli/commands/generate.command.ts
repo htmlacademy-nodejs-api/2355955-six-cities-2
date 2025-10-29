@@ -1,5 +1,5 @@
 import got from 'got';
-import { Logger } from '../../shared/helpers/index.js';
+import { ConsoleOutput } from '../../shared/helpers/index.js';
 import { TSVFileWriter } from '../../shared/libs/file-writer/tsv-file-writer.js';
 import { TSVOfferGenerator } from '../../shared/libs/offer-generator/tsv-offer-generator.js';
 import { MockServerData } from '../../shared/types/mock-server-data.type.js';
@@ -13,9 +13,9 @@ export class GenerateCommand implements Command {
 
   private async loadInitialData(url: string) {
     try {
-      Logger.progress(`Загружаю данные с сервера ${Logger.highlightFile(url)}`);
+      ConsoleOutput.progress(`Загружаю данные с сервера ${ConsoleOutput.highlightFile(url)}`);
       this.initialData = await got.get(url).json();
-      Logger.success('Данные успешно загружены с сервера');
+      ConsoleOutput.success('Данные успешно загружены с сервера');
     } catch {
       throw new Error(`Не удалось загрузить данные с ${url}`);
     }
@@ -26,7 +26,7 @@ export class GenerateCommand implements Command {
     const tsvOfferGenerator = new TSVOfferGenerator(this.initialData);
     const fileWriter = new TSVFileWriter(filePath);
 
-    Logger.progress(`Генерирую ${Logger.highlightNumber(count)} записей в файл ${Logger.highlightFile(filePath)}`);
+    ConsoleOutput.progress(`Генерирую ${ConsoleOutput.highlightNumber(count)} записей в файл ${ConsoleOutput.highlightFile(filePath)}`);
 
     for (let i = 0; i < count; i++) {
       await fileWriter.write(tsvOfferGenerator.generate());
@@ -34,7 +34,7 @@ export class GenerateCommand implements Command {
       // Показываем прогресс каждые 10% или при малом количестве записей
       if (count >= 10 && (i + 1) % Math.ceil(count / 10) === 0) {
         const progress = Math.round(((i + 1) / count) * 100);
-        Logger.log(`Прогресс: ${Logger.highlightNumber(progress)}% (${Logger.highlightNumber(i + 1)}/${Logger.highlightNumber(count)})`);
+        ConsoleOutput.log(`Прогресс: ${ConsoleOutput.highlightNumber(progress)}% (${ConsoleOutput.highlightNumber(i + 1)}/${ConsoleOutput.highlightNumber(count)})`);
       }
     }
   }
@@ -43,21 +43,21 @@ export class GenerateCommand implements Command {
     const [count, filepath, url] = parameters;
     const offerCount = Number.parseInt(count, 10);
 
-    Logger.section('ГЕНЕРАЦИЯ ДАННЫХ');
-    Logger.info(`Генерация ${Logger.highlightNumber(offerCount)} тестовых записей`);
+    ConsoleOutput.section('ГЕНЕРАЦИЯ ДАННЫХ');
+    ConsoleOutput.info(`Генерация ${ConsoleOutput.highlightNumber(offerCount)} тестовых записей`);
 
     try {
       await this.loadInitialData(url);
       await this.write(filepath, offerCount);
 
-      Logger.success(`Файл ${Logger.highlightFile(filepath)} успешно создан!`);
+      ConsoleOutput.success(`Файл ${ConsoleOutput.highlightFile(filepath)} успешно создан!`);
     } catch (error: unknown) {
-      Logger.error('Не удалось сгенерировать данные');
+      ConsoleOutput.error('Не удалось сгенерировать данные');
 
       if (error instanceof Error) {
-        Logger.error(error.message);
+        ConsoleOutput.error(error.message);
       } else {
-        Logger.error(String(error));
+        ConsoleOutput.error(String(error));
       }
     }
   }
