@@ -1,4 +1,4 @@
-export const OfferTypeEnum = {
-  Buy: 'Buy',
-  Sell: 'Sell',
-} as const;
+export enum OfferTypeEnum {
+  Buy = 'Buy',
+  Sell = 'Sell',
+}

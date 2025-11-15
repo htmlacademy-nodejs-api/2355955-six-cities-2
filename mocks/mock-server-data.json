@@ -62,10 +62,10 @@
       "https://example.com/photo12.jpg"
     ],
     "types": [
-      "apartment",
-      "house",
-      "hotel",
-      "room"
+      "Buy",
+      "Sell",
+      "Buy",
+      "Sell"
     ],
     "goods": [
       "Wi-Fi",
