@@ -1,6 +1,12 @@
+import { OfferTypeEnum } from '../types/offer.type.enum.js';
 import { Offer } from '../types/offer.type.js';
+import { User } from '../types/user.type.js';
 
-export function createOffer(offerData: string): Offer {
+export type OfferData = Omit<Offer,'categories'| 'userId'> & {
+  categories: string[];
+  user: User;
+}
+export function createOffer(offer: string): OfferData {
   const [
     title,
     description,
@@ -12,8 +18,9 @@ export function createOffer(offerData: string): Offer {
     firstName,
     lastName,
     email,
-    avatarPath
-  ] = offerData.replace('\n', '').split('\t');
+    avatarPath,
+
+  ] = offer.replace('\n', '').split('\t');
 
   const user = {
     email,
@@ -26,11 +33,10 @@ export function createOffer(offerData: string): Offer {
     title,
     description,
     image,
-    user,
     createdDate: new Date(createdDate),
-    type,
+    type: type as OfferTypeEnum,
     price: Number.parseInt(price, 10),
-    categories: categories.split(',')
-
+    categories: categories.split(','),
+    user,
   };
 }
