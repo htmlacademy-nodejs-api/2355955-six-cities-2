@@ -39,7 +39,7 @@ export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
   @prop({ required: true, ref: CategoryEntity, default: [], _id: false })
   public categories: Ref<CategoryEntity>[];
 
-  @prop({ required: true, ref: UserEntity, default: [] })
+  @prop({ required: true, ref: UserEntity })
   public userId: Ref<UserEntity>;
 
 

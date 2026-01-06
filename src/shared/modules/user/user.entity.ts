@@ -9,13 +9,14 @@ export interface UserEntity extends defaultClasses.Base {}
 @modelOptions({
   schemaOptions: {
     collection: 'users',
-    timestamps: true
+    timestamps: true,
   }
 })
 @injectable()
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class UserEntity extends defaultClasses.TimeStamps implements User {
-  @prop({ unique: true, required: true })
+
+  @prop({ unique: true, required: true, })
   public email: string;
 
   @prop({ required: false, default: '' })

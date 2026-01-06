@@ -5,6 +5,22 @@ import { RestSchema } from '../shared/libs/config/rest.schema.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { Logger } from '../shared/libs/logger/index.js';
 import { Component } from '../shared/types/component.type.js';
+
+/**
+ * Пример замены реализации логгера через Inversify:
+ *
+ * Чтобы заменить PinoLogger на другую реализацию (например, ConsoleLogger),
+ * достаточно изменить привязку в rest.container.ts:
+ *
+ * Было:
+ * container.bind(Component.Logger).to(PinoLogger).inSingletonScope();
+ *
+ * Стало:
+ * container.bind(Component.Logger).to(ConsoleLogger).inSingletonScope();
+ *
+ * Класс RestApplication не требует изменений, так как он зависит от интерфейса Logger,
+ * а не от конкретной реализации. Это демонстрирует принцип инверсии зависимостей (DIP).
+ */
 @injectable()
 export class RestApplication {
   constructor(
