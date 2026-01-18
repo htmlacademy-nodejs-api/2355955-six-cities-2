@@ -9,10 +9,9 @@ export class CreateOfferDto {
   description: string;
   createdDate: Date;
   previewImage: string;
-  image: string;
+  images: string[];
   type: OfferTypeEnum;
   price: number;
-  categories: string[];
   userId: string;
   city: Cities;
   isPremium: boolean;
@@ -23,4 +22,5 @@ export class CreateOfferDto {
   housingType: HousingTypeEnum;
   coordinates: Coordinates;
   amenities: AmenitiesTypeEnum[];
+  rating: number;
 }

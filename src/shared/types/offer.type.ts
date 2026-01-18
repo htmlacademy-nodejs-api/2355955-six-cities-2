@@ -1,5 +1,4 @@
 import { Ref } from '@typegoose/typegoose';
-import { CategoryEntity } from '../modules/category/category.entity.js';
 import { UserEntity } from '../modules/user/user.entity.js';
 import { AmenitiesTypeEnum } from './offer.amenities.enum.js';
 import { Cities } from './offer.cities.type.js';
@@ -12,10 +11,9 @@ export type Offer = {
   description: string;
   createdDate: Date;
   previewImage: string;
-  image: string;
+  images: string[];
   type: OfferTypeEnum;
   price: number;
-  categories: Ref<CategoryEntity>[];
   userId: Ref<UserEntity>;
   city: Cities;
   isPremium: boolean;
@@ -26,6 +24,7 @@ export type Offer = {
   coordinates: Coordinates;
   amenities: AmenitiesTypeEnum[]
   housingType: HousingTypeEnum;
+  rating: number;
 }
 
 
