@@ -27,7 +27,7 @@ export class DefaultOfferService implements OfferService {
   }
 
 
-  public async udateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
+  public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel.findByIdAndUpdate(offerId, dto, { new: true }).populate(['userId']).exec();
   }
 
@@ -69,5 +69,35 @@ export class DefaultOfferService implements OfferService {
       { $bit: { isFavorite: { xor: 1 } } },
       { new: true }
     ).exec();
+  }
+
+  public async getAverageOffersRatingByComments(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel.aggregate([
+      {
+        $lookup: {
+          from: 'comments',
+          localField: '_id',
+          foreignField: 'offerId',
+          as: 'comments'
+        }
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: {
+              if: { $gt: [{ $size: '$comments' }, 0] },
+              then: { $round: [{ $avg: '$comments.rating' }, 1] },
+              else: null
+            }
+          },
+          commentsCount: { $size: '$comments' }
+        }
+      },
+      {
+        $project: {
+          comments: 0
+        }
+      }
+    ]);
   }
 }

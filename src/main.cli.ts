@@ -14,6 +14,7 @@ function bootstrap() {
 
 
   cliApp.processCommand(process.argv);
+
 }
 
 bootstrap();
