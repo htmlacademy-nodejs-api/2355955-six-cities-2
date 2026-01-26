@@ -11,7 +11,7 @@ const MAX_COMMENTS_COUNT = 50;
 export class DefaultCommentService implements CommentService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
-    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>
+    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
   ) {}
 
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {

@@ -16,7 +16,7 @@ export class MongoDatabaseClient implements DatabaseClient {
     @inject(Component.Logger) private readonly logger: Logger
   ) {}
 
-  public async connect(uri: string): Promise<void> {
+  public async connect(uri: string): Promise<boolean> {
     if (this.isConnected) {
       throw new Error('MongoDB client already connected');
     }
@@ -28,13 +28,14 @@ export class MongoDatabaseClient implements DatabaseClient {
         this.mongoose = await Mongoose.connect(uri);
         this.isConnected = true;
         this.logger.info('Database connection established.');
-        return;
+        return this.isConnected;
       } catch (error) {
         attempt++;
         this.logger.error(`Failed to connect to the database. Attempt ${attempt}`, error as Error);
         await setTimeout(RETRY_TIMEOUT);
       }
     }
+    return this.isConnected;
   }
 
   public async disconnect(): Promise<void> {

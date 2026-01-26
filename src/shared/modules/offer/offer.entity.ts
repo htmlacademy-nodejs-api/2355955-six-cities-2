@@ -56,13 +56,17 @@ export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
   @prop({ required: true, min: 1, max: 8 })
   public roomsCount: number;
 
-  @prop({ required: true, enum: AmenitiesTypeEnum })
+  @prop({
+    required: true,
+    type: () => String,
+    enum: AmenitiesTypeEnum
+  })
   public amenities: AmenitiesTypeEnum[];
 
   @prop({ required: true, min: 1, max: 10 })
   public visitorsCount: number;
 
-  @prop({ required: true, type: { latitude: Number, longitude: Number } })
+  @prop({ required: true, type: Coordinates })
   public coordinates: Coordinates;
 
   @prop({ required: true, enum: HousingTypeEnum })
