@@ -1,0 +1,1151 @@
+openapi: 3.1.0
+info:
+  title: API сервер для демо-проекта «Шесть городов».
+  description: |-
+    * Список ресурсов и маршрутов сервера «Шесть городов».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 2.0.0
+tags:
+  - name: offers
+    description: Действия с объявлениями.
+  - name: comments
+    description: Действия с комментариями.
+  - name: users
+    description: Действия с пользователем.
+
+paths:
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+        required: true
+
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        "400":
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "409":
+          description: Пользователь с таким email уже существует.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conflictError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина и пароля.
+      requestBody:
+        description: Информация для авторизации пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginUser'
+        required: true
+
+      responses:
+        "200":
+          description: Пользователь авторизован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        "400":
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Неверный логин или пароль.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю.
+      responses:
+        "200":
+          description: Пользователь авторизован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /users/logout:
+    delete:
+      tags:
+        - users
+      summary: Выход из системы пользователя
+      description: Завершает сессию пользователя.
+      responses:
+        "204":
+          description: Сессия завершена.
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /users/avatar:
+    post:
+      tags:
+        - users
+      summary: Загрузить изображение аватара
+      description: Загружает изображение аватара пользователя. Изображение
+        аватара должно быть в формате `png` или `jpg`.
+      requestBody:
+        description: Изображение аватара.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: Аватар загружен. URL аватара.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatarUrl:
+                    type: string
+                    example: 'http://localhost:3000/upload/avatar.jpg'
+        "400":
+          description: Ошибка валидации данных. Неверный формат файла.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers:
+    get:
+      tags:
+        - offers
+      summary: Получить список объявлений
+      description: Получает список объявлений.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Максимальное количество объявлений.
+          schema:
+            type: integer
+            default: 60
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Список объявлений.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerListItem'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    post:
+      tags:
+        - offers
+      summary: Создать объявление
+      description: Создает новое объявление. Доступно только авторизованным пользователям.
+      requestBody:
+        description: Информация для создания нового объявления.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOffer'
+        required: true
+      responses:
+        "201":
+          description: Объявление создано. Объект объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "400":
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован. Создание объявления доступно только авторизованным пользователям.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Получить детальную информацию об объявлении
+      description: Получает детальную информацию об объявлении по ID.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      responses:
+        "200":
+          description: Детальная информация об объявлении.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    patch:
+      tags:
+        - offers
+      summary: Обновить объявление
+      description: Обновляет объявление. Доступно только авторизованным пользователям. Редактировать можно только свои объявления.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      requestBody:
+        description: Информация для обновления объявления.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateOffer'
+        required: true
+      responses:
+        "200":
+          description: Объявление обновлено. Объект объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "400":
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован. Редактирование объявления доступно только авторизованным пользователям.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "403":
+          description: Доступ запрещён. Редактировать можно только свои объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbiddenError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    delete:
+      tags:
+        - offers
+      summary: Удалить объявление
+      description: Удаляет объявление. Доступно только авторизованным пользователям. Удалить можно только свои объявления.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      responses:
+        "204":
+          description: Объявление удалено.
+        "401":
+          description: Пользователь не авторизован. Удаление объявления доступно только авторизованным пользователям.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "403":
+          description: Доступ запрещён. Удалить можно только свои объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forbiddenError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/premium:
+    get:
+      tags:
+        - offers
+      summary: Получить список премиальных объявлений для города
+      description: Возвращает список премиальных объявлений для определённого города. Максимум 3 объявления.
+      parameters:
+        - name: city
+          in: query
+          required: true
+          description: Название города.
+          schema:
+            type: string
+            enum:
+              - Paris
+              - Cologne
+              - Brussels
+              - Amsterdam
+              - Hamburg
+              - Dusseldorf
+            example: Paris
+      responses:
+        "200":
+          description: Список премиальных объявлений для указанного города.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/offerListItem'
+        "400":
+          description: Ошибка валидации. Не указан или некорректный параметр city.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/favorites:
+    get:
+      tags:
+        - offers
+      summary: Получить список избранных объявлений
+      description: Получает список избранных объявлений. Доступно только авторизованным пользователям.
+      responses:
+        "200":
+          description: Список избранных объявлений.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/offerListItem'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/{offerId}/favorite:
+    post:
+      tags:
+        - offers
+      summary: Добавить объявление в избранное
+      description: Добавляет объявление в избранное. Доступно только авторизованным пользователям.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      responses:
+        "200":
+          description: Объявление добавлено в избранное. Объект объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    delete:
+      tags:
+        - offers
+      summary: Убрать объявление из избранного
+      description: Убирает объявление из избранного. Доступно только авторизованным пользователям.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      responses:
+        "200":
+          description: Объявление убрано из избранного. Объект объявления.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/{offerId}/comments:
+    get:
+      tags:
+        - comments
+      summary: Получить список комментариев к объявлению
+      description: Получает список комментариев к объявлению. Максимум 50 комментариев, отсортированных по дате (новые сначала).
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      responses:
+        "200":
+          description: Список комментариев к объявлению.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 50
+                items:
+                  $ref: '#/components/schemas/comment'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+    post:
+      tags:
+        - comments
+      summary: Добавить комментарий к объявлению
+      description: Добавляет комментарий к объявлению. Доступно только авторизованным пользователям.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      requestBody:
+        description: Информация для создания нового комментария.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createComment'
+        required: true
+      responses:
+        "201":
+          description: Комментарий добавлен. Объект комментария.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+        "400":
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован. Добавление комментария доступно только авторизованным пользователям.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+components:
+  parameters:
+    offerId:
+      name: offerId
+      in: path
+      required: true
+      description: Уникальный идентификатор объявления.
+      schema:
+        type: string
+        example: 6329c3d6a04ab1061c6425ea
+
+  schemas:
+    # === Пользователи ===
+    createUser:
+      type: object
+      required:
+        - email
+        - name
+        - password
+        - userType
+      properties:
+        email:
+          type: string
+          format: email
+          example: keks@htmlacademy.ru
+        name:
+          type: string
+          minLength: 1
+          maxLength: 15
+          example: Keks
+        password:
+          type: string
+          minLength: 6
+          maxLength: 12
+          example: '123456'
+        userType:
+          type: string
+          enum:
+            - regular
+            - pro
+          example: regular
+
+    loginUser:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: keks@htmlacademy.ru
+        password:
+          type: string
+          example: '123456'
+
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        email:
+          type: string
+          format: email
+          example: keks@htmlacademy.ru
+        name:
+          type: string
+          example: Keks
+        avatarUrl:
+          type: string
+          example: 'http://localhost:3000/upload/avatar.jpg'
+        userType:
+          type: string
+          enum:
+            - regular
+            - pro
+          example: regular
+
+    # === Объявления ===
+    offerListItem:
+      type: object
+      description: Краткая информация об объявлении для отображения в списке.
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        title:
+          type: string
+          example: 'Уютная квартира в центре Парижа'
+        price:
+          type: number
+          example: 150
+        housingType:
+          type: string
+          enum:
+            - Apartment
+            - House
+            - Room
+            - Hotel
+          example: 'Apartment'
+        isFavorite:
+          type: boolean
+          example: false
+        createdDate:
+          type: string
+          format: date-time
+          example: '2026-01-17T10:00:00.000Z'
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: 'Paris'
+        previewImage:
+          type: string
+          example: 'https://example.com/preview.jpg'
+        isPremium:
+          type: boolean
+          example: true
+        rating:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 5
+          example: 4.5
+        commentsCount:
+          type: integer
+          example: 10
+
+    offer:
+      type: object
+      description: Полная информация об объявлении.
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+          example: 'Уютная квартира в центре Парижа'
+        description:
+          type: string
+          minLength: 20
+          maxLength: 1024
+          example: 'Просторная квартира с видом на Эйфелеву башню. Идеально подходит для романтического отдыха.'
+        createdDate:
+          type: string
+          format: date-time
+          example: '2026-01-17T10:00:00.000Z'
+        previewImage:
+          type: string
+          example: 'https://example.com/preview.jpg'
+        images:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            type: string
+          example:
+            - 'https://example.com/img1.jpg'
+            - 'https://example.com/img2.jpg'
+            - 'https://example.com/img3.jpg'
+            - 'https://example.com/img4.jpg'
+            - 'https://example.com/img5.jpg'
+            - 'https://example.com/img6.jpg'
+        price:
+          type: number
+          minimum: 100
+          maximum: 100000
+          example: 150
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: 'Paris'
+        isPremium:
+          type: boolean
+          example: true
+        isFavorite:
+          type: boolean
+          example: false
+        rating:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 5
+          example: 4.5
+        housingType:
+          type: string
+          enum:
+            - Apartment
+            - House
+            - Room
+            - Hotel
+          example: 'Apartment'
+        roomsCount:
+          type: integer
+          minimum: 1
+          maximum: 8
+          example: 3
+        visitorsCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 4
+        amenities:
+          type: array
+          items:
+            type: string
+            enum:
+              - Breakfast
+              - AirConditioning
+              - LaptopFriendly
+              - Workspace
+              - BabySeat
+              - Washer
+              - Towels
+              - Fridge
+          example:
+            - Breakfast
+            - AirConditioning
+            - Workspace
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              example: 48.8566
+            longitude:
+              type: number
+              example: 2.3522
+        commentsCount:
+          type: integer
+          example: 10
+        userId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
+    createOffer:
+      type: object
+      required:
+        - title
+        - description
+        - city
+        - previewImage
+        - images
+        - isPremium
+        - housingType
+        - roomsCount
+        - visitorsCount
+        - price
+        - amenities
+        - coordinates
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+          example: 'Уютная квартира в центре Парижа'
+        description:
+          type: string
+          minLength: 20
+          maxLength: 1024
+          example: 'Просторная квартира с видом на Эйфелеву башню.'
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: 'Paris'
+        previewImage:
+          type: string
+          example: 'https://example.com/preview.jpg'
+        images:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            type: string
+          example:
+            - 'https://example.com/img1.jpg'
+            - 'https://example.com/img2.jpg'
+            - 'https://example.com/img3.jpg'
+            - 'https://example.com/img4.jpg'
+            - 'https://example.com/img5.jpg'
+            - 'https://example.com/img6.jpg'
+        isPremium:
+          type: boolean
+          example: true
+        housingType:
+          type: string
+          enum:
+            - Apartment
+            - House
+            - Room
+            - Hotel
+          example: 'Apartment'
+        roomsCount:
+          type: integer
+          minimum: 1
+          maximum: 8
+          example: 3
+        visitorsCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 4
+        price:
+          type: number
+          minimum: 100
+          maximum: 100000
+          example: 150
+        amenities:
+          type: array
+          items:
+            type: string
+            enum:
+              - Breakfast
+              - AirConditioning
+              - LaptopFriendly
+              - Workspace
+              - BabySeat
+              - Washer
+              - Towels
+              - Fridge
+          example:
+            - Breakfast
+            - AirConditioning
+        coordinates:
+          type: object
+          required:
+            - latitude
+            - longitude
+          properties:
+            latitude:
+              type: number
+              example: 48.8566
+            longitude:
+              type: number
+              example: 2.3522
+
+    updateOffer:
+      type: object
+      description: Все поля опциональны — можно обновить только нужные.
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 100
+          example: 'Обновлённое название'
+        description:
+          type: string
+          minLength: 20
+          maxLength: 1024
+          example: 'Обновлённое описание квартиры.'
+        city:
+          type: string
+          enum:
+            - Paris
+            - Cologne
+            - Brussels
+            - Amsterdam
+            - Hamburg
+            - Dusseldorf
+          example: 'Paris'
+        previewImage:
+          type: string
+          example: 'https://example.com/new-preview.jpg'
+        images:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            type: string
+        isPremium:
+          type: boolean
+          example: false
+        housingType:
+          type: string
+          enum:
+            - Apartment
+            - House
+            - Room
+            - Hotel
+          example: 'House'
+        roomsCount:
+          type: integer
+          minimum: 1
+          maximum: 8
+          example: 4
+        visitorsCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 6
+        price:
+          type: number
+          minimum: 100
+          maximum: 100000
+          example: 200
+        amenities:
+          type: array
+          items:
+            type: string
+            enum:
+              - Breakfast
+              - AirConditioning
+              - LaptopFriendly
+              - Workspace
+              - BabySeat
+              - Washer
+              - Towels
+              - Fridge
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              example: 48.8566
+            longitude:
+              type: number
+              example: 2.3522
+
+    # === Комментарии ===
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        text:
+          type: string
+          minLength: 5
+          maxLength: 1024
+          example: 'Отличное место! Рекомендую всем!'
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        createdDate:
+          type: string
+          format: date-time
+          example: '2026-01-17T10:00:00.000Z'
+        user:
+          $ref: '#/components/schemas/user'
+
+    createComment:
+      type: object
+      required:
+        - text
+        - rating
+      properties:
+        text:
+          type: string
+          minLength: 5
+          maxLength: 1024
+          example: 'Отличное место! Рекомендую всем!'
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+
+    # === Ошибки ===
+    validationError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'VALIDATION_ERROR'
+        message:
+          type: string
+          example: 'Ошибка валидации данных'
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              property:
+                type: string
+                example: 'email'
+              value:
+                type: string
+                example: 'invalid-email'
+              messages:
+                type: array
+                items:
+                  type: string
+                example:
+                  - 'email must be a valid email address'
+
+    unauthorizedError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'UNAUTHORIZED'
+        message:
+          type: string
+          example: 'Пользователь не авторизован'
+
+    forbiddenError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'FORBIDDEN'
+        message:
+          type: string
+          example: 'Доступ запрещён. У вас нет прав для выполнения этого действия.'
+
+    notFoundError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'NOT_FOUND'
+        message:
+          type: string
+          example: 'Ресурс не найден'
+
+    conflictError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'CONFLICT'
+        message:
+          type: string
+          example: 'Пользователь с таким email уже существует'
+
+    serverError:
+      type: object
+      properties:
+        errorType:
+          type: string
+          example: 'INTERNAL_SERVER_ERROR'
+        message:
+          type: string
+          example: 'Внутренняя ошибка сервера'

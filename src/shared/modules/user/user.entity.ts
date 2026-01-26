@@ -9,17 +9,18 @@ export interface UserEntity extends defaultClasses.Base {}
 @modelOptions({
   schemaOptions: {
     collection: 'users',
-    timestamps: true
+    timestamps: true,
   }
 })
 @injectable()
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class UserEntity extends defaultClasses.TimeStamps implements User {
-  @prop({ unique: true, required: true })
+
+  @prop({ unique: true, required: true, })
   public email: string;
 
-  @prop({ required: false, default: '' })
-  public avatarPath: string;
+  @prop()
+  public avatarPath?: string;
 
   @prop({ required: true })
   public firstName: string;
@@ -27,8 +28,11 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({ required: true })
   public lastName: string;
 
-  @prop({ required: true, default: '' })
+  @prop({ required: true, minlength: 6, maxlength: 12 })
   private password?: string;
+
+  @prop({ required: true, })
+  public account: 'pro' | 'base';
 
   constructor(userData: CreateUserDto) {
     super();
