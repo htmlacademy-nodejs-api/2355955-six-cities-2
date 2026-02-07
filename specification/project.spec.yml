@@ -612,7 +612,7 @@ components:
         - email
         - name
         - password
-        - userType
+        - account
       properties:
         email:
           type: string
@@ -628,12 +628,12 @@ components:
           minLength: 6
           maxLength: 12
           example: '123456'
-        userType:
+        account:
           type: string
           enum:
-            - regular
+            - base
             - pro
-          example: regular
+          example: base
 
     loginUser:
       type: object
@@ -665,12 +665,12 @@ components:
         avatarUrl:
           type: string
           example: 'http://localhost:3000/upload/avatar.jpg'
-        userType:
+        account:
           type: string
           enum:
-            - regular
+            - base
             - pro
-          example: regular
+          example: base
 
     # === Объявления ===
     offerListItem:
