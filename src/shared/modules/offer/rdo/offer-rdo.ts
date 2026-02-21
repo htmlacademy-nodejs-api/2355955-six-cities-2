@@ -25,7 +25,7 @@ export class OfferRdo {
   public city: Cities;
 
   @Expose()
-  public previwewImage: string;
+  public previewImage: string;
 
   @Expose()
   public isPremium: boolean;

@@ -39,7 +39,7 @@ export class UserController extends BaseController {
       throw new HttpError(
         StatusCodes.CONFLICT
         , `User with email ${body.email} already exists`
-        , 'UserController'
+        , UserController.name
       );
     }
 
