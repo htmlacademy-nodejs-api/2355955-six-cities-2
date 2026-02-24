@@ -2,6 +2,7 @@ import { Container } from 'inversify';
 import { RestConfig } from '../shared/libs/config/index.js';
 import { MongoDatabaseClient } from '../shared/libs/database-client/index.js';
 import { PinoLogger } from '../shared/libs/logger/index.js';
+import { AppExceptionFilter } from '../shared/libs/rest/app-exception-filter.js';
 import { Component } from '../shared/types/component.type.js';
 import { RestApplication } from './rest.application.js';
 
@@ -11,5 +12,6 @@ export const createRestApplicationContainer = () => {
   container.bind(Component.Config).to(RestConfig).inSingletonScope();
   container.bind(Component.RestApplication).to(RestApplication).inSingletonScope();
   container.bind(Component.DatabaseClient).to(MongoDatabaseClient).inSingletonScope();
+  container.bind(Component.ExceptionFilter).to(AppExceptionFilter).inSingletonScope();
   return container;
 };

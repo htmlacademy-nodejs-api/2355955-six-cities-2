@@ -9,6 +9,5 @@ export const createCommentContainer = () => {
   const container = new Container();
   container.bind<CommentService>(Component.CommentService).to(DefaultCommentService);
   container.bind<types.ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
-
   return container;
 };

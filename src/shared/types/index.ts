@@ -7,6 +7,8 @@ export * from './offer.coordinates.type.js';
 export * from './offer.housing.type.js';
 export * from './offer.type.enum.js';
 export * from './offer.type.js';
+
 export * from './sort-type.enum.js';
+export * from './user.account.type.js';
 export * from './user.type.js';
 

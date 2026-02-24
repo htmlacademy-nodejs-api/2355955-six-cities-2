@@ -1,0 +1,37 @@
+# Категории
+## Получить список предложений
+GET http://localhost:4000/offers HTTP/1.1
+Content-Type: application/json
+
+###
+
+## Создать предложение
+POST http://localhost:4000/offers HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Новая квартира в центре",
+  "description": "Просторная квартира с видом на парк",
+  "createdDate": "2024-02-07T10:00:00.000Z",
+  "previewImage": "https://example.com/images/offer1.jpg",
+  "images": [
+    "https://example.com/images/offer1_1.jpg",
+    "https://example.com/images/offer1_2.jpg"
+  ],
+  "type": "Buy",
+  "price": 12000,
+  "userId": "507f1f77bcf86cd799439011",
+  "city": "Paris",
+  "isPremium": true,
+  "isFavorite": false,
+  "roomsCount": 3,
+  "commentsCount": 0,
+  "visitorsCount": 0,
+  "housingType": "Apartment",
+  "coordinates": {
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  "amenities": ["Workspace", "LaptopFriendly", "AirConditioning"],
+  "rating": 4.5
+}
