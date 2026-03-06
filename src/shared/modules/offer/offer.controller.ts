@@ -12,12 +12,12 @@ import { Component } from '../../types/index.js';
 import { CommentService } from '../comment/comment-service.interface.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { isOfferIdIsStringType } from './helpers/index.js';
 import { OfferService } from './offer-service.interface.js';
 import { OfferRdo } from './rdo/offer-rdo.js';
 import { ParamOfferId } from './types/param-offerid.type.js';
 import { RequestQuery } from './types/request-query.type.js';
 const USER_ID = '507f1f77bcf86cd799439011'; //TODO получить id юзера из токена
-const isOfferIdIsStringType = (offerId:unknown): offerId is string => typeof offerId === 'string';
 @injectable()
 export class OfferController extends BaseController {
   constructor(
