@@ -5,13 +5,19 @@ import { inject, injectable } from 'inversify';
 import { fillDTO } from '../../helpers/index.js';
 import { RestSchema } from '../../libs/config/rest.schema.js';
 import { Logger } from '../../libs/logger/index.js';
+import { UploadFileMiddleware } from '../../libs/middleware/upload-file.middleware.js';
+import { ValidateDtoMiddleware } from '../../libs/middleware/validate-dto.middleware.js';
+import { ValidateObjectIdMiddleware } from '../../libs/middleware/validate-objectid.middleware.js';
 import { HttpError } from '../../libs/rest/errors/http-error.js';
 import { BaseController } from '../../libs/rest/index.js';
 import { CreateUserRequest } from '../../types/create-user-request.type.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
 import { Component } from '../../types/index.js';
 import { LoginUserRequest } from '../../types/login-user-request.type.js';
+import { CreateUserDto } from './dto/index.js';
+import { LoginUserDto } from './dto/login-user.dto.js';
 import { UserRdo } from './rdo/create-user.rdo.js';
+import { UploadAvatarRequest } from './types/index.js';
 import { UserService } from './user-service.interface.js';
 
 @injectable()
@@ -24,8 +30,17 @@ export class UserController extends BaseController {
     super(logger);
     this.logger.info('Register routes for UserController…');
 
-    this.addRoute({ path: '/register', method: HttpMethod.Post, handler: this.create.bind(this) });
-    this.addRoute({ path: '/login', method: HttpMethod.Post, handler: this.login.bind(this) });
+    this.addRoute({ path: '/register', method: HttpMethod.Post, handler: this.create.bind(this), middlewares: [new ValidateDtoMiddleware(CreateUserDto)] });
+    this.addRoute({ path: '/login', method: HttpMethod.Post, handler: this.login.bind(this), middlewares: [new ValidateDtoMiddleware(LoginUserDto)] });
+    this.addRoute({
+      path: '/:userId/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new ValidateObjectIdMiddleware('userId'),
+        new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
+      ]
+    });
   }
 
   public create = async (
@@ -69,5 +84,11 @@ export class UserController extends BaseController {
       'Not implemented',
       'UserController',
     );
+  }
+
+  public async uploadAvatar(req: UploadAvatarRequest, res: Response) {
+    this.created(res, {
+      filepath: req.file?.path
+    });
   }
 }

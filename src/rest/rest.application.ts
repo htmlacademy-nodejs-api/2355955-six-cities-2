@@ -6,6 +6,7 @@ import { RestSchema } from '../shared/libs/config/rest.schema.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { Logger } from '../shared/libs/logger/index.js';
 import { ExceptionFilter } from '../shared/libs/rest/index.js';
+import { CommentController } from '../shared/modules/comment/comment.controller.js';
 import { OfferController } from '../shared/modules/offer/offer.controller.js';
 import { UserController } from '../shared/modules/user/user.controller.js';
 import { Component } from '../shared/types/component.type.js';
@@ -19,7 +20,8 @@ export class RestApplication {
     @inject(Component.DatabaseClient) private readonly databaseClient: DatabaseClient,
     @inject(Component.OfferController) private readonly offerController: OfferController,
     @inject(Component.UserController) private readonly userController: UserController,
-    @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter
+    @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter,
+    @inject(Component.CommentController) private readonly commentController: CommentController,
   ) {
     this.server = express();
   }
@@ -33,6 +35,10 @@ export class RestApplication {
 
   private async _initMiddleware() {
     this.server.use(express.json());
+    this.server.use(
+      '/upload',
+      express.static(this.config.get('UPLOAD_DIRECTORY'))
+    );
   }
 
 
@@ -40,6 +46,7 @@ export class RestApplication {
     this.logger.info('Init controllers…');
     this.server.use('/users', this.userController.router);
     this.server.use('/offers', this.offerController.router);
+    this.server.use('/comments', this.commentController.router);
   }
 
   private async _initExceptionFilters() {
