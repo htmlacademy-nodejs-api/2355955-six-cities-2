@@ -16,7 +16,6 @@ export class DefaultOfferService implements OfferService {
   ) {}
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    //TOOD добавить проверку на существование юзера, который создает оффер
     const result = await this.offerModel.create(dto);
     this.logger.info(`New offer created: ${dto.title}`);
 
@@ -24,7 +23,6 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async deleteById(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null> {
-    //TOOD корренто ли проверку на принадлежность оффера юзеру делать здесь или в контроллере?
     return this.offerModel.findByIdAndDelete({
       userId: userId,
       _id: offerId

@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { inject, injectable } from 'inversify';
 import { fillDTO } from '../../helpers/common.js';
 import { Logger } from '../../libs/logger/index.js';
+import { PrivateRouteMiddleware } from '../../libs/middleware/private-route.middleware.js';
 import { ValidateDtoMiddleware } from '../../libs/middleware/validate-dto.middleware.js';
 import { ValidateObjectIdMiddleware } from '../../libs/middleware/validate-objectid.middleware.js';
 import { BaseController } from '../../libs/rest/base-controller.abstract.js';
@@ -30,10 +31,10 @@ export class OfferController extends BaseController {
     this.logger.info('Register routes for OfferController');
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new ValidateDtoMiddleware(CreateOfferDto)] });
+    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new PrivateRouteMiddleware(), new ValidateDtoMiddleware(CreateOfferDto)] });
     this.addRoute({ path: '/:offerId', method: HttpMethod.Get, handler: this.getById, middlewares: [new ValidateObjectIdMiddleware('offerId')] });
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.deleteById, middlewares: [new ValidateObjectIdMiddleware('offerId')] });
-    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.updateById, middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto)] });
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Delete, handler: this.deleteById, middlewares: [new PrivateRouteMiddleware(), new ValidateObjectIdMiddleware('offerId')] });
+    this.addRoute({ path: '/:offerId', method: HttpMethod.Patch, handler: this.updateById, middlewares:[new PrivateRouteMiddleware(), new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto)] });
     this.addRoute({ path: '/:offerId/comments', method: HttpMethod.Get, handler: this.getCommentsByOfferId, middlewares: [new ValidateObjectIdMiddleware('offerId')] });
   }
 
@@ -45,10 +46,8 @@ export class OfferController extends BaseController {
   };
 
   public create = async (req: Request, res: Response): Promise<void> => {
-    //TOOD добавить проверку на авторизацию пользователя, который создает оффер
-    const { body } = req;
-
-    const offer = await this.offerService.create(body);
+    const { body, tokenPayload } = req;
+    const offer = await this.offerService.create({ ...body, userId: tokenPayload.id });
     this.created(res, fillDTO(OfferRdo, offer));
   };
 
@@ -72,8 +71,16 @@ export class OfferController extends BaseController {
   };
 
   public deleteById = async (req: Request<ParamOfferId>, res: Response): Promise<void> => {
-    //TODO добавить проверку на авторизацию пользователя, который удаляет оффер
+
     const { offerId } = req.params;
+    const { tokenPayload } = req;
+    if (!tokenPayload) {
+      throw new HttpError(
+        StatusCodes.FORBIDDEN ,
+        'Not authorized',
+        OfferController.name
+      );
+    }
     const id = isOfferIdIsStringType(offerId) ? offerId : offerId[0];
 
     const offer = await this.offerService.findById(id);
@@ -85,10 +92,10 @@ export class OfferController extends BaseController {
       );
     }
 
-    if (offer.userId.toString() !== USER_ID) {
+    if (offer.userId.toString() !== tokenPayload.id) {
       throw new HttpError(
         StatusCodes.FORBIDDEN,
-        `User with id ${USER_ID} is not allowed to delete offer with id ${id }.`,
+        `User with id ${tokenPayload.id} is not allowed to delete offer with id ${id }.`,
         OfferController.name,
       );
     }
@@ -98,9 +105,9 @@ export class OfferController extends BaseController {
   };
 
 
-  public updateById = async ({ params, body }: Request<ParamOfferId, unknown, UpdateOfferDto>, res: Response): Promise<void> => {
-    //TODO добавить проверку на авторизацию пользователя, который обновляет оффер
+  public updateById = async ({ params, body, tokenPayload }: Request<ParamOfferId, unknown, UpdateOfferDto>, res: Response): Promise<void> => {
     const { offerId } = params;
+
     const id = isOfferIdIsStringType(offerId) ? offerId : offerId[0];
     const offer = await this.offerService.findById(id);
 
@@ -112,10 +119,10 @@ export class OfferController extends BaseController {
       );
     }
 
-    if (offer.userId.toString() !== USER_ID) {
+    if (offer.userId.toString() !== tokenPayload.id) {
       throw new HttpError(
         StatusCodes.FORBIDDEN,
-        `User with id ${USER_ID} is not allowed to update offer with id ${id}.`,
+        `User with id ${tokenPayload.id} is not allowed to update offer with id ${id}.`,
         OfferController.name,
       );
     }
