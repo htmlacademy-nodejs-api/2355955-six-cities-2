@@ -6,7 +6,7 @@ import { createCommentContainer } from './shared/modules/comment/comment.contain
 import { createOfferContainer } from './shared/modules/offer/offer.container.js';
 import { createUserContainer } from './shared/modules/user/user.container.js';
 import { Component } from './shared/types/component.type.js';
-
+//TODO удалить этот коммент
 async function bootstrap() {
   const appContainer = Container.merge(createRestApplicationContainer(), createUserContainer(), createCategoryContainer(), createOfferContainer(), createCommentContainer());
 
