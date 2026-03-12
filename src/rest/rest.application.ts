@@ -5,6 +5,7 @@ import { Config } from '../shared/libs/config/index.js';
 import { RestSchema } from '../shared/libs/config/rest.schema.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { Logger } from '../shared/libs/logger/index.js';
+import { ParseTokenMiddleware } from '../shared/libs/middleware/parse-token.middleware.js';
 import { ExceptionFilter } from '../shared/libs/rest/index.js';
 import { CommentController } from '../shared/modules/comment/comment.controller.js';
 import { OfferController } from '../shared/modules/offer/offer.controller.js';
@@ -34,6 +35,8 @@ export class RestApplication {
   }
 
   private async _initMiddleware() {
+    const authenticateMiddleware = new ParseTokenMiddleware(this.config.get('JWT_SECRET'));
+    this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
     this.server.use(express.json());
     this.server.use(
       '/upload',

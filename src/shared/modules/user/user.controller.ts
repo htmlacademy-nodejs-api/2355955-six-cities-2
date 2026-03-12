@@ -1,5 +1,5 @@
 import { Config } from 'convict';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { inject, injectable } from 'inversify';
 import { fillDTO } from '../../helpers/index.js';
@@ -14,18 +14,20 @@ import { CreateUserRequest } from '../../types/create-user-request.type.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
 import { Component } from '../../types/index.js';
 import { LoginUserRequest } from '../../types/login-user-request.type.js';
+import { AuthService } from './auth/auth-service.interface..js';
 import { CreateUserDto } from './dto/index.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { UserRdo } from './rdo/create-user.rdo.js';
+import { LoggedUserRdo } from './rdo/logged-user.rdo.js';
 import { UploadAvatarRequest } from './types/index.js';
 import { UserService } from './user-service.interface.js';
-
 @injectable()
 export class UserController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: Logger,
     @inject(Component.UserService) private readonly userService: UserService,
     @inject(Component.Config) private readonly config: Config<RestSchema>,
+    @inject(Component.AuthService) private readonly authService: AuthService,
   ) {
     super(logger);
     this.logger.info('Register routes for UserController…');
@@ -63,32 +65,35 @@ export class UserController extends BaseController {
   };
 
   public async login(
-    _req: LoginUserRequest,
-    _res: Response,
+    { body }: LoginUserRequest,
+    res: Response,
   ): Promise<void> {
-    const { body } = _req;
-    console.log('body', body);
-
-    const existsUser = await this.userService.findByEmail(body.email);
-
-    if (!existsUser) {
-      throw new HttpError(
-        StatusCodes.UNAUTHORIZED,
-        `User with email ${body.email} not found.`,
-        'UserController',
-      );
-    }
-
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Not implemented',
-      'UserController',
-    );
+    const user = await this.authService.verify(body);
+    const token = await this.authService.authenticate(user);
+    const responseData = fillDTO(LoggedUserRdo, {
+      email: user.email,
+      token,
+    });
+    this.ok(res, responseData);
   }
 
   public async uploadAvatar(req: UploadAvatarRequest, res: Response) {
     this.created(res, {
       filepath: req.file?.path
     });
+  }
+
+  public async checkAuthenticate({ tokenPayload: { email } }: Request, res: Response) {
+    const foundedUser = await this.userService.findByEmail(email);
+
+    if (! foundedUser) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'UserController'
+      );
+    }
+
+    this.ok(res, fillDTO(LoggedUserRdo, foundedUser));
   }
 }

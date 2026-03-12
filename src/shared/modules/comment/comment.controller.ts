@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { inject, injectable } from 'inversify';
 import { fillDTO } from '../../helpers/common.js';
 import { Logger } from '../../libs/logger/index.js';
+import { PrivateRouteMiddleware } from '../../libs/middleware/private-route.middleware.js';
 import { ValidateDtoMiddleware } from '../../libs/middleware/validate-dto.middleware.js';
 import { BaseController } from '../../libs/rest/base-controller.abstract.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
@@ -21,11 +22,10 @@ export class CommentController extends BaseController {
 
     this.logger.info('Register routes for CommentController');
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new ValidateDtoMiddleware(CreateCommentDto)] });
+    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create, middlewares: [new PrivateRouteMiddleware(), new ValidateDtoMiddleware(CreateCommentDto)] });
   }
 
   public create = async (req: Request<ParamsDictionary, unknown, CreateCommentDto>, res: Response): Promise<void> => {
-    //TODO добавить проверку на авторизацию пользователя, который создает комментарий
     const { body } = req;
     const comment = await this.commentService.create(body);
 
