@@ -62,7 +62,7 @@ paths:
       tags:
         - users
       summary: Авторизация пользователя
-      description: Авторизует пользователя на основе логина и пароля.
+      description: Авторизует пользователя на основе логина и пароля. Возвращает объект пользователя с JWT-токеном.
       requestBody:
         description: Информация для авторизации пользователя.
         content:
@@ -73,11 +73,11 @@ paths:
 
       responses:
         "200":
-          description: Пользователь авторизован. Объект пользователя.
+          description: Пользователь авторизован. Объект пользователя с токеном.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/loggedUser'
         "400":
           description: Ошибка валидации данных.
           content:
@@ -97,60 +97,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/serverError'
 
-    get:
-      tags:
-        - users
-      summary: Проверка состояния пользователя
-      description: Возвращает информацию по авторизованному пользователю.
-      responses:
-        "200":
-          description: Пользователь авторизован. Объект пользователя.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user'
-        "401":
-          description: Пользователь не авторизован.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/unauthorizedError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
-  /users/logout:
-    delete:
-      tags:
-        - users
-      summary: Выход из системы пользователя
-      description: Завершает сессию пользователя.
-      responses:
-        "204":
-          description: Сессия завершена.
-        "401":
-          description: Пользователь не авторизован.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/unauthorizedError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
-  /users/avatar:
+  /users/{userId}/avatar:
     post:
       tags:
         - users
       summary: Загрузить изображение аватара
       description: Загружает изображение аватара пользователя. Изображение
-        аватара должно быть в формате `png` или `jpg`.
+        аватара должно быть в формате `png` или `jpg`. Требует авторизации.
+      parameters:
+        - $ref: '#/components/parameters/userId'
       requestBody:
         description: Изображение аватара.
         content:
@@ -163,16 +118,12 @@ paths:
                   format: binary
         required: true
       responses:
-        "200":
-          description: Аватар загружен. URL аватара.
+        "201":
+          description: Аватар загружен. Объект пользователя.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  avatarUrl:
-                    type: string
-                    example: 'http://localhost:3000/upload/avatar.jpg'
+                $ref: '#/components/schemas/user'
         "400":
           description: Ошибка валидации данных. Неверный формат файла.
           content:
@@ -216,7 +167,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/offerListItem'
+                  $ref: '#/components/schemas/offer'
         "500":
           description: Внутренняя ошибка сервера.
           content:
@@ -377,153 +328,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/serverError'
 
-  /offers/premium:
-    get:
-      tags:
-        - offers
-      summary: Получить список премиальных объявлений для города
-      description: Возвращает список премиальных объявлений для определённого города. Максимум 3 объявления.
-      parameters:
-        - name: city
-          in: query
-          required: true
-          description: Название города.
-          schema:
-            type: string
-            enum:
-              - Paris
-              - Cologne
-              - Brussels
-              - Amsterdam
-              - Hamburg
-              - Dusseldorf
-            example: Paris
-      responses:
-        "200":
-          description: Список премиальных объявлений для указанного города.
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 3
-                items:
-                  $ref: '#/components/schemas/offerListItem'
-        "400":
-          description: Ошибка валидации. Не указан или некорректный параметр city.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/validationError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
-  /offers/favorites:
-    get:
-      tags:
-        - offers
-      summary: Получить список избранных объявлений
-      description: Получает список избранных объявлений. Доступно только авторизованным пользователям.
-      responses:
-        "200":
-          description: Список избранных объявлений.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/offerListItem'
-        "401":
-          description: Пользователь не авторизован.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/unauthorizedError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
-  /offers/{offerId}/favorite:
-    post:
-      tags:
-        - offers
-      summary: Добавить объявление в избранное
-      description: Добавляет объявление в избранное. Доступно только авторизованным пользователям.
-      parameters:
-        - $ref: '#/components/parameters/offerId'
-      responses:
-        "200":
-          description: Объявление добавлено в избранное. Объект объявления.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/offer'
-        "401":
-          description: Пользователь не авторизован.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/unauthorizedError'
-        "404":
-          description: Объявление не найдено.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/notFoundError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
-    delete:
-      tags:
-        - offers
-      summary: Убрать объявление из избранного
-      description: Убирает объявление из избранного. Доступно только авторизованным пользователям.
-      parameters:
-        - $ref: '#/components/parameters/offerId'
-      responses:
-        "200":
-          description: Объявление убрано из избранного. Объект объявления.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/offer'
-        "401":
-          description: Пользователь не авторизован.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/unauthorizedError'
-        "404":
-          description: Объявление не найдено.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/notFoundError'
-        "500":
-          description: Внутренняя ошибка сервера.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/serverError'
-
   /offers/{offerId}/comments:
     get:
       tags:
         - comments
       summary: Получить список комментариев к объявлению
-      description: Получает список комментариев к объявлению. Максимум 50 комментариев, отсортированных по дате (новые сначала).
+      description: Получает список комментариев к объявлению.
       parameters:
         - $ref: '#/components/parameters/offerId'
+        - name: limit
+          in: query
+          required: false
+          description: Максимальное количество комментариев.
+          schema:
+            type: integer
       responses:
         "200":
           description: Список комментариев к объявлению.
@@ -531,7 +349,6 @@ paths:
             application/json:
               schema:
                 type: array
-                maxItems: 50
                 items:
                   $ref: '#/components/schemas/comment'
         "404":
@@ -547,13 +364,114 @@ paths:
               schema:
                 $ref: '#/components/schemas/serverError'
 
+  /offers/{offerId}/images:
+    post:
+      tags:
+        - offers
+      summary: Загрузить фотографию объявления
+      description: Загружает фотографию к объявлению. Требует авторизации.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      requestBody:
+        description: Файл изображения.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "201":
+          description: Изображение загружено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/uploadImageResponse'
+        "400":
+          description: Файл изображения не передан или неверный формат.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /offers/{offerId}/preview-image:
+    post:
+      tags:
+        - offers
+      summary: Загрузить превью-изображение объявления
+      description: Загружает превью-изображение к объявлению. Требует авторизации.
+      parameters:
+        - $ref: '#/components/parameters/offerId'
+      requestBody:
+        description: Файл превью-изображения.
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                previewImage:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "201":
+          description: Превью-изображение загружено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/uploadImageResponse'
+        "400":
+          description: Файл изображения не передан или неверный формат.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validationError'
+        "401":
+          description: Пользователь не авторизован.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/unauthorizedError'
+        "404":
+          description: Объявление не найдено.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notFoundError'
+        "500":
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverError'
+
+  /comments:
     post:
       tags:
         - comments
       summary: Добавить комментарий к объявлению
       description: Добавляет комментарий к объявлению. Доступно только авторизованным пользователям.
-      parameters:
-        - $ref: '#/components/parameters/offerId'
       requestBody:
         description: Информация для создания нового комментария.
         content:
@@ -580,12 +498,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/unauthorizedError'
-        "404":
-          description: Объявление не найдено.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/notFoundError'
         "500":
           description: Внутренняя ошибка сервера.
           content:
@@ -604,13 +516,23 @@ components:
         type: string
         example: 6329c3d6a04ab1061c6425ea
 
+    userId:
+      name: userId
+      in: path
+      required: true
+      description: Уникальный идентификатор пользователя.
+      schema:
+        type: string
+        example: 6329c3d6a04ab1061c6425ea
+
   schemas:
     # === Пользователи ===
     createUser:
       type: object
       required:
         - email
-        - name
+        - firstName
+        - lastName
         - password
         - account
       properties:
@@ -618,11 +540,16 @@ components:
           type: string
           format: email
           example: keks@htmlacademy.ru
-        name:
+        firstName:
           type: string
           minLength: 1
           maxLength: 15
           example: Keks
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 64
+          example: Ivanov
         password:
           type: string
           minLength: 6
@@ -634,6 +561,9 @@ components:
             - base
             - pro
           example: base
+        avatarPath:
+          type: string
+          example: 'avatar.jpg'
 
     loginUser:
       type: object
@@ -652,19 +582,19 @@ components:
     user:
       type: object
       properties:
-        id:
-          type: string
-          example: 6329c3d6a04ab1061c6425ea
         email:
           type: string
           format: email
           example: keks@htmlacademy.ru
-        name:
+        firstName:
           type: string
           example: Keks
-        avatarUrl:
+        lastName:
           type: string
-          example: 'http://localhost:3000/upload/avatar.jpg'
+          example: Ivanov
+        avatarPath:
+          type: string
+          example: 'http://localhost:4000/upload/avatar.jpg'
         account:
           type: string
           enum:
@@ -672,103 +602,56 @@ components:
             - pro
           example: base
 
-    # === Объявления ===
-    offerListItem:
+    loggedUser:
       type: object
-      description: Краткая информация об объявлении для отображения в списке.
+      description: Объект авторизованного пользователя с JWT-токеном.
       properties:
-        id:
+        token:
           type: string
-          example: 6329c3d6a04ab1061c6425ea
-        title:
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        email:
           type: string
-          example: 'Уютная квартира в центре Парижа'
-        price:
-          type: number
-          example: 150
-        housingType:
+          format: email
+          example: keks@htmlacademy.ru
+        firstName:
           type: string
-          enum:
-            - Apartment
-            - House
-            - Room
-            - Hotel
-          example: 'Apartment'
-        isFavorite:
-          type: boolean
-          example: false
-        createdDate:
+          example: Keks
+        lastName:
           type: string
-          format: date-time
-          example: '2026-01-17T10:00:00.000Z'
-        city:
+          example: Ivanov
+        avatarPath:
           type: string
-          enum:
-            - Paris
-            - Cologne
-            - Brussels
-            - Amsterdam
-            - Hamburg
-            - Dusseldorf
-          example: 'Paris'
-        previewImage:
-          type: string
-          example: 'https://example.com/preview.jpg'
-        isPremium:
-          type: boolean
-          example: true
-        rating:
-          type: number
-          format: float
-          minimum: 1
-          maximum: 5
-          example: 4.5
-        commentsCount:
-          type: integer
-          example: 10
+          example: 'http://localhost:4000/upload/avatar.jpg'
 
+    # === Объявления ===
     offer:
       type: object
-      description: Полная информация об объявлении.
+      description: Информация об объявлении.
       properties:
         id:
           type: string
           example: 6329c3d6a04ab1061c6425ea
         title:
           type: string
-          minLength: 10
-          maxLength: 100
           example: 'Уютная квартира в центре Парижа'
-        description:
+        price:
+          type: number
+          example: 150
+        housingType:
           type: string
-          minLength: 20
-          maxLength: 1024
-          example: 'Просторная квартира с видом на Эйфелеву башню. Идеально подходит для романтического отдыха.'
+          enum:
+            - Apartment
+            - House
+            - Room
+            - Hotel
+          example: 'Apartment'
+        isFavorite:
+          type: boolean
+          example: false
         createdDate:
           type: string
           format: date-time
           example: '2026-01-17T10:00:00.000Z'
-        previewImage:
-          type: string
-          example: 'https://example.com/preview.jpg'
-        images:
-          type: array
-          minItems: 6
-          maxItems: 6
-          items:
-            type: string
-          example:
-            - 'https://example.com/img1.jpg'
-            - 'https://example.com/img2.jpg'
-            - 'https://example.com/img3.jpg'
-            - 'https://example.com/img4.jpg'
-            - 'https://example.com/img5.jpg'
-            - 'https://example.com/img6.jpg'
-        price:
-          type: number
-          minimum: 100
-          maximum: 100000
-          example: 150
         city:
           type: string
           enum:
@@ -779,84 +662,43 @@ components:
             - Hamburg
             - Dusseldorf
           example: 'Paris'
+        previewImage:
+          type: string
+          example: 'http://localhost:4000/upload/preview.jpg'
         isPremium:
           type: boolean
           example: true
-        isFavorite:
-          type: boolean
-          example: false
         rating:
           type: number
           format: float
-          minimum: 1
+          minimum: 0
           maximum: 5
           example: 4.5
-        housingType:
-          type: string
-          enum:
-            - Apartment
-            - House
-            - Room
-            - Hotel
-          example: 'Apartment'
-        roomsCount:
-          type: integer
-          minimum: 1
-          maximum: 8
-          example: 3
-        visitorsCount:
-          type: integer
-          minimum: 1
-          maximum: 10
-          example: 4
-        amenities:
-          type: array
-          items:
-            type: string
-            enum:
-              - Breakfast
-              - AirConditioning
-              - LaptopFriendly
-              - Workspace
-              - BabySeat
-              - Washer
-              - Towels
-              - Fridge
-          example:
-            - Breakfast
-            - AirConditioning
-            - Workspace
-        coordinates:
-          type: object
-          properties:
-            latitude:
-              type: number
-              example: 48.8566
-            longitude:
-              type: number
-              example: 2.3522
         commentsCount:
           type: integer
           example: 10
-        userId:
-          type: string
-          example: 6329c3d6a04ab1061c6425ea
+        user:
+          $ref: '#/components/schemas/user'
 
     createOffer:
       type: object
       required:
         - title
         - description
+        - createdDate
         - city
         - previewImage
         - images
+        - type
         - isPremium
+        - isFavorite
         - housingType
         - roomsCount
         - visitorsCount
         - price
         - amenities
         - coordinates
+        - rating
       properties:
         title:
           type: string
@@ -868,6 +710,10 @@ components:
           minLength: 20
           maxLength: 1024
           example: 'Просторная квартира с видом на Эйфелеву башню.'
+        createdDate:
+          type: string
+          format: date-time
+          example: '2026-01-17T10:00:00.000Z'
         city:
           type: string
           enum:
@@ -883,20 +729,23 @@ components:
           example: 'https://example.com/preview.jpg'
         images:
           type: array
-          minItems: 6
-          maxItems: 6
           items:
             type: string
           example:
             - 'https://example.com/img1.jpg'
             - 'https://example.com/img2.jpg'
-            - 'https://example.com/img3.jpg'
-            - 'https://example.com/img4.jpg'
-            - 'https://example.com/img5.jpg'
-            - 'https://example.com/img6.jpg'
+        type:
+          type: string
+          enum:
+            - Buy
+            - Sell
+          example: 'Buy'
         isPremium:
           type: boolean
           example: true
+        isFavorite:
+          type: boolean
+          example: false
         housingType:
           type: string
           enum:
@@ -948,6 +797,11 @@ components:
             longitude:
               type: number
               example: 2.3522
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+          example: 4.5
 
     updateOffer:
       type: object
@@ -963,6 +817,10 @@ components:
           minLength: 20
           maxLength: 1024
           example: 'Обновлённое описание квартиры.'
+        createdDate:
+          type: string
+          format: date-time
+          example: '2026-01-17T10:00:00.000Z'
         city:
           type: string
           enum:
@@ -978,11 +836,18 @@ components:
           example: 'https://example.com/new-preview.jpg'
         images:
           type: array
-          minItems: 6
-          maxItems: 6
           items:
             type: string
+        type:
+          type: string
+          enum:
+            - Buy
+            - Sell
+          example: 'Buy'
         isPremium:
+          type: boolean
+          example: false
+        isFavorite:
           type: boolean
           example: false
         housingType:
@@ -1030,6 +895,24 @@ components:
             longitude:
               type: number
               example: 2.3522
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+          example: 4.0
+
+    uploadImageResponse:
+      type: object
+      properties:
+        previewImage:
+          type: string
+          example: 'http://localhost:4000/upload/preview.jpg'
+        images:
+          type: array
+          items:
+            type: string
+          example:
+            - 'http://localhost:4000/upload/img1.jpg'
 
     # === Комментарии ===
     comment:
@@ -1038,13 +921,13 @@ components:
         id:
           type: string
           example: 6329c3d6a04ab1061c6425ea
-        text:
+        comment:
           type: string
           minLength: 5
           maxLength: 1024
           example: 'Отличное место! Рекомендую всем!'
         rating:
-          type: integer
+          type: number
           minimum: 1
           maximum: 5
           example: 5
@@ -1058,19 +941,27 @@ components:
     createComment:
       type: object
       required:
-        - text
+        - comment
         - rating
+        - userId
+        - offerId
       properties:
-        text:
+        comment:
           type: string
           minLength: 5
           maxLength: 1024
           example: 'Отличное место! Рекомендую всем!'
         rating:
-          type: integer
+          type: number
           minimum: 1
           maximum: 5
           example: 5
+        userId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        offerId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
 
     # === Ошибки ===
     validationError:

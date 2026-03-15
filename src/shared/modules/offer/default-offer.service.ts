@@ -16,7 +16,7 @@ export class DefaultOfferService implements OfferService {
   ) {}
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    const result = await this.offerModel.create(dto);
+    const result = await (await this.offerModel.create(dto)).populate(['userId']);
     this.logger.info(`New offer created: ${dto.title}`);
 
     return result;
@@ -34,12 +34,28 @@ export class DefaultOfferService implements OfferService {
     return this.offerModel.findByIdAndUpdate(offerId, dto, { new: true }).populate(['userId']).exec();
   }
 
+  public async addImageById(offerId: string, imagePath: string): Promise<DocumentType<OfferEntity> | null> {
+    return this.offerModel.findByIdAndUpdate(
+      offerId,
+      { $push: { images: imagePath } },
+      { new: true }
+    ).populate(['userId']).exec();
+  }
+
+  public async addPreviewImageById(offerId: string, imagePath: string): Promise<DocumentType<OfferEntity> | null> {
+    return this.offerModel.findByIdAndUpdate(
+      offerId,
+      { previewImage: imagePath },
+      { new: true }
+    ).populate(['userId']).exec();
+  }
+
   public async findById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findById(offerId).populate(['userId']).exec();
+    return this.offerModel.findById(offerId).exec();
   }
 
   public async find(limit: number = 60): Promise<DocumentType<OfferEntity>[] | null> {
-    return this.offerModel.find({}, { amenities: 0, coordinates: 0, visitorsCount: 0, images: 0, roomsCount: 0, description: 0 })
+    return this.offerModel.find()
       .sort({ createdAt: SortType.Down })
       .limit(limit).populate(['userId']).exec();
   }
@@ -54,14 +70,15 @@ export class DefaultOfferService implements OfferService {
 
 
   public async findPremiumByCity(city: string, limit: number): Promise<DocumentType<OfferEntity>[] | null> {
-    return this.offerModel.find({ city, isPremium: true, }, { amenities: 0, coordinates: 0, visitorsCount: 0, images: 0, roomsCount: 0, description: 0 })
+    return this.offerModel.find({ city, isPremium: true, },)
+      .sort({ createdAt: SortType.Down })
       .limit(limit)
       .populate(['userId'])
       .exec();
   }
 
   public async findFavourite(): Promise<DocumentType<OfferEntity>[] | null> {
-    return this.offerModel.find({ isFavorite: true }, { amenities: 0, coordinates: 0, visitorsCount: 0, images: 0, roomsCount: 0, description: 0 })
+    return this.offerModel.find({ isFavorite: true })
       .populate(['userId'])
       .exec();
   }
@@ -69,9 +86,9 @@ export class DefaultOfferService implements OfferService {
   public async addOrRemoveFromFavourite(offerId: string): Promise<DocumentType<OfferEntity> | null> {
     return this.offerModel.findByIdAndUpdate(
       offerId,
-      { $bit: { isFavorite: { xor: 1 } } },
+      [{ $set: { isFavorite: { $not: ['$isFavorite'] } } }],
       { new: true }
-    ).exec();
+    ).populate(['userId']).exec();
   }
 
   public async getAverageOffersRatingByComments(): Promise<DocumentType<OfferEntity>[]> {

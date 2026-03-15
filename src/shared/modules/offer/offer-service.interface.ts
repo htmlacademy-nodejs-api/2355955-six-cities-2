@@ -6,6 +6,8 @@ export interface OfferService {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
   deleteById(offerId: string, userId: string): Promise<DocumentType<OfferEntity> | null>;
   updateById(offerId: string, dto: Partial<CreateOfferDto>): Promise<DocumentType<OfferEntity> | null>;
+  addImageById(offerId: string, imagePath: string): Promise<DocumentType<OfferEntity> | null>;
+  addPreviewImageById(offerId: string, imagePath: string): Promise<DocumentType<OfferEntity> | null>;
   findById(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   find(limit:number): Promise<DocumentType<OfferEntity>[] | null>;
   incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null>;

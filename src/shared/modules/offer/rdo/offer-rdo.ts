@@ -29,6 +29,9 @@ export class OfferRdo {
   public previewImage: string;
 
   @Expose()
+  public images: string[] ;
+
+  @Expose()
   public isPremium: boolean;
 
   @Expose()

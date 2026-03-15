@@ -3,6 +3,7 @@ import { injectable } from 'inversify';
 import { createSHA256 } from '../../helpers/index.js';
 import { User } from '../../types/index.js';
 import { UserAccountType } from '../../types/user.account.type.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface UserEntity extends defaultClasses.Base {}
@@ -34,6 +35,14 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   @prop({ required: true, })
   public account: UserAccountType;
 
+  constructor(userDto: CreateUserDto) {
+    super();
+    this.email = userDto.email;
+    this.firstName = userDto.firstName;
+    this.lastName = userDto.lastName;
+    this.account = userDto.account;
+    this.avatarPath = userDto.avatarPath;
+  }
 
   public setPassword(password: string, salt: string) {
     this.password = createSHA256(password, salt);

@@ -3,6 +3,8 @@ import { RestConfig } from '../shared/libs/config/index.js';
 import { MongoDatabaseClient } from '../shared/libs/database-client/index.js';
 import { PinoLogger } from '../shared/libs/logger/index.js';
 import { AppExceptionFilter } from '../shared/libs/rest/app-exception-filter.js';
+import { PathTransformer } from '../shared/libs/rest/transform/path-transformer.js';
+import { ValidationExceptionFilter } from '../shared/libs/rest/validation.exception-filter.js';
 import { Component } from '../shared/types/component.type.js';
 import { RestApplication } from './rest.application.js';
 
@@ -13,5 +15,7 @@ export const createRestApplicationContainer = () => {
   container.bind(Component.RestApplication).to(RestApplication).inSingletonScope();
   container.bind(Component.DatabaseClient).to(MongoDatabaseClient).inSingletonScope();
   container.bind(Component.ExceptionFilter).to(AppExceptionFilter).inSingletonScope();
+  container.bind(Component.ValidationExceptionFilter).to(ValidationExceptionFilter).inSingletonScope();
+  container.bind(Component.PathTransformer).to(PathTransformer).inSingletonScope();
   return container;
 };
