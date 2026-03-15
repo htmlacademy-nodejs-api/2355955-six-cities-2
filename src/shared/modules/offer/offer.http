@@ -1,17 +1,20 @@
-# Категории
-## Получить список предложений
+# Объявления
+
+## Получить список объявлений
+
 GET http://localhost:4000/offers HTTP/1.1
-Content-Type: application/json
 
 ###
 
-## Создать предложение
+## Создать объявление
+
 POST http://localhost:4000/offers HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
 Content-Type: application/json
 
 {
   "title": "Новая квартира в центре",
-  "description": "Просторная квартира с видом на парк",
+  "description": "Просторная квартира с видом на парк, рядом со всей инфраструктурой",
   "createdDate": "2024-02-07T10:00:00.000Z",
   "previewImage": "https://example.com/images/offer1.jpg",
   "images": [
@@ -20,13 +23,13 @@ Content-Type: application/json
   ],
   "type": "Buy",
   "price": 12000,
-  "userId": "507f1f77bcf86cd799439011",
+  "userId": "69b6b6f4b68782480b950375",
   "city": "Paris",
   "isPremium": true,
   "isFavorite": false,
   "roomsCount": 3,
   "commentsCount": 0,
-  "visitorsCount": 0,
+  "visitorsCount": 4,
   "housingType": "Apartment",
   "coordinates": {
     "latitude": 48.8566,
@@ -35,50 +38,89 @@ Content-Type: application/json
   "amenities": ["Workspace", "LaptopFriendly", "AirConditioning"],
   "rating": 4.5
 }
-###
-
-# Получить предложение по идентификатору
-GET http://localhost:4000/offers/62711a50b0e24a624d49ffdc HTTP/1.1
 
 ###
 
+## Получить объявление по идентификатору
 
-## Получить список предложений
-GET http://localhost:4000/offers HTTP/1.1
+GET http://localhost:4000/offers/69b6bdd1c8aa6ae1d0d06adf HTTP/1.1
 
 ###
 
-## Обновить предложение по идентификатору
+## Обновить объявление по идентификатору
 
-PATCH  http://localhost:4000/offers/62825028a75295825778ac80 HTTP/1.1
+PATCH http://localhost:4000/offers/69b6bdd1c8aa6ae1d0d06adf HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
 
 {
   "title": "Обновлённое название квартиры",
-  "description": "Обновлённое описание квартиры",
+  "description": "Обновлённое описание квартиры с новыми деталями",
   "price": 15000
 }
 
 ###
-## Удалить предложение по идентификатору
 
-DELETE http://localhost:4000/offers/62825028a75295825778ac80 HTTP/1.1
+## Удалить объявление по идентификатору
 
-###
-
-
-## Список комментариев определённого предложения
-
-GET http://localhost:4000/offers/65258514a30fc6ef77c0edfe/comments?limit=10 HTTP/1.1
+DELETE http://localhost:4000/offers/69b6e50f25ff459d3b8239da HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
 
 ###
 
+## Получить список комментариев объявления
 
-## Создание комментария для предложения
-POST http://localhost:4000/offers/65258514a30fc6ef77c0edfe/comments HTTP/1.1
-Content-Type: application/json
-{
-  "text": "Отличное предложение, очень понравилось!",
-  "offerId": "65258514a30fc6ef77c0edfe",
-  "userId": "507f1f77bcf86cd799439011"
-}
+GET http://localhost:4000/offers/69b6e58625ff459d3b8239e6/comments?limit=10 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
+
+###
+
+## Загрузить фотографию объявления
+
+POST http://localhost:4000/offers/69b6bec87d8069bbe1fdca92/images HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="image"; filename="offer-image.png"
+Content-Type: image/png
+
+< ./offer-image.png
+------Boundary--
+
+###
+
+## Загрузить превью-изображение объявления
+
+POST http://localhost:4000/offers/69b6bec87d8069bbe1fdca92/preview-image HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="previewImage"; filename="offer-image.png"
+Content-Type: image/png
+
+< ./offer-image.png
+------Boundary--
+
+###
+
+## Получить премиальные предложения для города
+
+GET http://localhost:4000/offers/premium/Paris HTTP/1.1
+
+###
+
+## Получить список избранных предложений
+
+GET http://localhost:4000/offers/favorites HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
+
+###
+
+## Добавить или удалить предложение из избранного
+
+POST http://localhost:4000/offers/69b6e58625ff459d3b8239e6/favorite HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJmaXJzdE5hbWUiOiJKYWNrIiwibGFzdE5hbWUiOiJUb3JyYW5jZSIsImlkIjoiNjliNmI2ZjRiNjg3ODI0ODBiOTUwMzc1IiwiaWF0IjoxNzczNTgyMTUyLCJleHAiOjE3NzM3NTQ5NTJ9.h6P9GD2ydY4Ci1ndhVIINuI9nt7ZpEudpSct0K1TjBU
+
+###

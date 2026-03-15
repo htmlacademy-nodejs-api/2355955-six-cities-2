@@ -1,14 +1,5 @@
 {
   "api": {
-    "categories": [
-      "Квартира",
-      "Дом",
-      "Отель",
-      "Комната",
-      "Лофт",
-      "Коттедж",
-      "Апартаменты"
-    ],
     "cities": [
       "Paris",
       "Cologne",
@@ -61,25 +52,29 @@
       "https://example.com/photo11.jpg",
       "https://example.com/photo12.jpg"
     ],
-    "types": [
-      "Buy",
-      "Sell",
-      "Buy",
-      "Sell"
+    "housingTypes": [
+      "Apartment",
+      "House",
+      "Room",
+      "Hotel"
     ],
-    "goods": [
-      "Wi-Fi",
-      "Air conditioning",
+    "amenities": [
       "Breakfast",
-      "Fridge",
-      "Towels",
+      "AirConditioning",
+      "LaptopFriendly",
+      "Workspace",
+      "BabySeat",
       "Washer",
-      "Coffee machine",
-      "Laptop friendly workspace",
-      "Sauna",
-      "Baby seat",
-      "Kitchen",
-      "Parking"
+      "Towels",
+      "Fridge"
+    ],
+    "coordinates": [
+      "48.8566,2.3522",
+      "50.9375,6.9603",
+      "50.8503,4.3517",
+      "52.3676,4.9041",
+      "53.5511,9.9937",
+      "51.2277,6.7735"
     ],
     "users": [
       "John Doe",
@@ -111,6 +106,10 @@
       "https://example.com/avatars/oliver.jpg",
       "https://example.com/avatars/sophie.jpg"
     ],
+    "accounts": [
+      "pro",
+      "base"
+    ],
     "prices": [120, 180, 250, 310, 420, 550, 620, 750],
     "ratings": [3.5, 4.0, 4.2, 4.5, 4.6, 4.8, 5.0],
     "dates": [
@@ -121,10 +120,9 @@
       "2025-09-18",
       "2025-09-20"
     ],
-     "isPremium": [true, false],
-     "isFavorite": [true, false],
-     "isPro": [true, false],
-
+    "isPremium": [true, false],
+    "isFavorite": [true, false],
+    "isPro": [true, false],
     "capacity": {
       "bedrooms": [1, 2, 3, 4, 5],
       "maxAdults": [2, 3, 4, 6, 8]

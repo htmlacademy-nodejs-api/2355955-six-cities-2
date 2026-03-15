@@ -4,22 +4,23 @@ type Capacity = {
   maxAdults: number[]
 }
 export type MockServerData = {
-  categories: string[];
   cities: string[];
   titles: string[];
   descriptions: string[];
   previewImages: string[];
   images: string[];
-  types: string[];
-  goods: string[];
+  housingTypes: string[];
+  amenities: string[];
+  coordinates: string[];
   users: string[];
   emails: string[];
   avatars: string[];
+  accounts: string[];
   prices: number[];
   ratings: number[];
   dates: string[];
-  isPremium: boolean;
-  isFavorite: boolean;
-  isPro: boolean;
+  isPremium: boolean[];
+  isFavorite: boolean[];
+  isPro: boolean[];
   capacity: Capacity;
 }

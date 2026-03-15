@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsMongoId, IsNumber, IsString, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsMongoId, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateNested } from 'class-validator';
 import { AmenitiesTypeEnum } from '../../../types/offer.amenities.enum.js';
 import { Cities } from '../../../types/offer.cities.type.js';
 import { Coordinates } from '../../../types/offer.coordinates.type.js';
@@ -18,6 +18,7 @@ export class CreateOfferDto {
   @IsDateString({}, { message: 'createdDate must be a valid ISO date' })
     createdDate: Date;
 
+  @IsOptional()
   @IsString({ message: 'previewImage must be a string' })
     previewImage: string;
 
@@ -51,6 +52,7 @@ export class CreateOfferDto {
   @Max(8, { message: 'roomsCount must be less than or equal to 8' })
     roomsCount: number;
 
+  @IsOptional()
   @IsNumber({}, { message: 'guestsCount must be a number' })
     commentsCount: number;
 

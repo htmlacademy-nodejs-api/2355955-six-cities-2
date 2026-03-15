@@ -1,17 +1,19 @@
+import cors from 'cors';
 import express, { Express } from 'express';
 import { inject, injectable } from 'inversify';
-import { getMongoURI } from '../shared/helpers/index.js';
+import { getFullServerPath, getMongoURI } from '../shared/helpers/index.js';
 import { Config } from '../shared/libs/config/index.js';
 import { RestSchema } from '../shared/libs/config/rest.schema.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { Logger } from '../shared/libs/logger/index.js';
 import { ParseTokenMiddleware } from '../shared/libs/middleware/parse-token.middleware.js';
 import { ExceptionFilter } from '../shared/libs/rest/index.js';
+import { ValidationExceptionFilter } from '../shared/libs/rest/validation.exception-filter.js';
 import { CommentController } from '../shared/modules/comment/comment.controller.js';
 import { OfferController } from '../shared/modules/offer/offer.controller.js';
+import { AuthExceptionFilter } from '../shared/modules/user/auth/auth.exception-filter.js';
 import { UserController } from '../shared/modules/user/user.controller.js';
 import { Component } from '../shared/types/component.type.js';
-
 @injectable()
 export class RestApplication {
   private readonly server: Express;
@@ -23,6 +25,8 @@ export class RestApplication {
     @inject(Component.UserController) private readonly userController: UserController,
     @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter,
     @inject(Component.CommentController) private readonly commentController: CommentController,
+    @inject(Component.AuthExceptionFilter) private readonly authExeptionFilter: AuthExceptionFilter,
+    @inject(Component.ValidationExceptionFilter) private readonly validationExceptionFilter: ValidationExceptionFilter
   ) {
     this.server = express();
   }
@@ -35,12 +39,17 @@ export class RestApplication {
   }
 
   private async _initMiddleware() {
+    this.server.use(cors());
     const authenticateMiddleware = new ParseTokenMiddleware(this.config.get('JWT_SECRET'));
     this.server.use(authenticateMiddleware.execute.bind(authenticateMiddleware));
     this.server.use(express.json());
     this.server.use(
       '/upload',
       express.static(this.config.get('UPLOAD_DIRECTORY'))
+    );
+    this.server.use(
+      '/static',
+      express.static(this.config.get('STATIC_DIRECTORY_PATH'))
     );
   }
 
@@ -53,6 +62,8 @@ export class RestApplication {
   }
 
   private async _initExceptionFilters() {
+    this.server.use(this.authExeptionFilter.catch.bind(this.authExeptionFilter));
+    this.server.use(this.validationExceptionFilter.catch.bind(this.validationExceptionFilter));
     this.server.use(this.appExceptionFilter.catch.bind(this.appExceptionFilter));
   }
 
@@ -91,6 +102,6 @@ export class RestApplication {
 
     this.logger.info('Try to init server');
     await this._initServer();
-    this.logger.info(`🚀 Server started on http://localhost:${this.config.get('PORT')}`);
+    this.logger.info(`🚀 Server started on ${getFullServerPath(this.config.get('HOST'), this.config.get('PORT'))}`);
   }
 }

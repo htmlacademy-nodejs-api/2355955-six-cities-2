@@ -29,7 +29,8 @@
     "pino-pretty": "^10.2.0",
     "rimraf": "5.0.1",
     "ts-node": "10.9.1",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "@types/cors": "2.8.15"
   },
   "type": "module",
   "engines": {
@@ -63,6 +64,7 @@
     "nodemon": "^3.1.11",
     "pino": "^8.15.1",
     "reflect-metadata": "^0.1.13",
-    "tslib": "^2.8.1"
+    "tslib": "^2.8.1",
+    "cors": "2.8.5"
   }
 }
