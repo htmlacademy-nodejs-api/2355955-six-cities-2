@@ -5,8 +5,6 @@ export const Component = {
   DatabaseClient: Symbol.for('DatabaseClient'),
   UserService: Symbol.for('UserService'),
   UserModel: Symbol.for('UserModel'),
-  CategoryModel: Symbol.for('CategoryModel'),
-  CategoryService: Symbol.for('CategoryService'),
   OfferModel: Symbol.for('OfferModel'),
   OfferService: Symbol.for('OfferService'),
   CommentModel: Symbol.for('CommentModel'),
@@ -17,4 +15,6 @@ export const Component = {
   CommentController: Symbol.for('CommentController'),
   AuthService: Symbol.for('AuthService'),
   AuthExceptionFilter: Symbol.for('AuthExceptionFilter'),
+  ValidationExceptionFilter: Symbol.for('ValidationExceptionFilter'),
+  PathTransformer: Symbol.for('PathTransformer'),
 } as const;

@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify';
 import { fillDTO } from '../../helpers/index.js';
 import { RestSchema } from '../../libs/config/rest.schema.js';
 import { Logger } from '../../libs/logger/index.js';
+import { PrivateRouteMiddleware } from '../../libs/middleware/private-route.middleware.js';
 import { UploadFileMiddleware } from '../../libs/middleware/upload-file.middleware.js';
 import { ValidateDtoMiddleware } from '../../libs/middleware/validate-dto.middleware.js';
 import { ValidateObjectIdMiddleware } from '../../libs/middleware/validate-objectid.middleware.js';
@@ -14,6 +15,7 @@ import { CreateUserRequest } from '../../types/create-user-request.type.js';
 import { HttpMethod } from '../../types/http-method.enum.js';
 import { Component } from '../../types/index.js';
 import { LoginUserRequest } from '../../types/login-user-request.type.js';
+import { isIdIsStringType } from '../offer/helpers/isOfferIdIsStringType.js';
 import { AuthService } from './auth/auth-service.interface..js';
 import { CreateUserDto } from './dto/index.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
@@ -39,6 +41,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('userId'),
         new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
@@ -70,17 +73,25 @@ export class UserController extends BaseController {
   ): Promise<void> {
     const user = await this.authService.verify(body);
     const token = await this.authService.authenticate(user);
-    const responseData = fillDTO(LoggedUserRdo, {
-      email: user.email,
-      token,
-    });
-    this.ok(res, responseData);
+    const responseData = fillDTO(LoggedUserRdo, user);
+    this.ok(res, { ...responseData, token });
   }
 
-  public async uploadAvatar(req: UploadAvatarRequest, res: Response) {
-    this.created(res, {
-      filepath: req.file?.path
-    });
+  public async uploadAvatar({ params, file }: UploadAvatarRequest, res: Response) {
+    const { userId } = params;
+    const id = isIdIsStringType(userId) ? userId : userId[0];
+    const existsUser = await this.userService.findById(id);
+    if (!existsUser) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `User with id ${id} not found`,
+        'UserController'
+      );
+    }
+
+    const updatedUser = await this.userService.updateById(id, { avatarPath: file?.filename });
+
+    this.created(res, fillDTO(UserRdo, updatedUser));
   }
 
   public async checkAuthenticate({ tokenPayload: { email } }: Request, res: Response) {

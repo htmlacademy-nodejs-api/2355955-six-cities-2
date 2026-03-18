@@ -1,24 +1,30 @@
 import { DocumentType, types } from '@typegoose/typegoose';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Logger } from '../../libs/logger/logger.interface.js';
 import { Component } from '../../types/component.type.js';
 import { SortType } from '../../types/index.js';
+import { OfferService } from '../offer/offer-service.interface.js';
 import { CommentService } from './comment-service.interface.js';
 import { CommentEntity } from './comment.entity.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 const MAX_COMMENTS_COUNT = 50;
+
+@injectable()
 export class DefaultCommentService implements CommentService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>,
+    @inject(Component.OfferService) private readonly offerService: OfferService,
   ) {}
 
   public async create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>> {
     const comment = await this.commentModel.create(dto);
 
-    this.logger.info(`New comment created: ${dto.comment}`);
+    await this.offerService.incCommentCount(dto.offerId);
 
-    return await comment.populate(['userId']);
+    await comment.populate(['userId', 'offerId']);
+
+    return comment;
   }
 
   async findById(commentId: string): Promise<DocumentType<CommentEntity> | null> {

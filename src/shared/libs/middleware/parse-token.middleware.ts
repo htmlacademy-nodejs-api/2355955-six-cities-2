@@ -10,8 +10,8 @@ function isTokenPayload(payload: unknown): payload is TokenPayload {
   return (
     (typeof payload === 'object' && payload !== null) &&
     ('email' in payload && typeof payload.email === 'string') &&
-    ('firstname' in payload && typeof payload.firstname === 'string') &&
-    ('lastname' in payload && typeof payload.lastname === 'string') &&
+    ('firstName' in payload && typeof payload.firstName === 'string') &&
+    ('lastName' in payload && typeof payload.lastName === 'string') &&
     ('id' in payload && typeof payload.id === 'string')
   );
 }

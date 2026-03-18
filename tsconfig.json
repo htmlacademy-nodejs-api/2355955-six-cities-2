@@ -31,7 +31,7 @@
   },
   "include": [
     "src/**/*.ts"
-, "src/main.rest.ts", "src/shared/libs/middleware/private-route.middleware.ts"  ],
+, "src/main.rest.ts", "src/shared/libs/middleware/private-route.middleware.ts", "src/shared/libs/rest/transform/index.ts‎", "src/shared/libs/rest/transform/path-transformer.ts‎"  ],
   "exclude": [
     "node_modules",
     "**/*.test.ts"

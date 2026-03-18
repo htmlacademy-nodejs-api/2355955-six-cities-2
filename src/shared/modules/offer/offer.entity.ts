@@ -20,10 +20,13 @@ export interface OfferEntity extends defaultClasses.Base {}
 // Зачем поле createdDate, в модели буду поля класса defaultClasses.TimeStamps
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
-  commentsCount: number;
-  previewImage: string;
+  @prop()
+  public previewImage: string;
 
-  @prop({ required: true })
+  @prop({ default: 0 })
+  public commentsCount: number;
+
+  @prop({ required: true, minlength: 10, maxlength: 100 })
   public title: string;
 
   @prop({ required: true })
